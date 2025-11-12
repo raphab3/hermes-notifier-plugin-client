@@ -1,6 +1,6 @@
 {
   "name": "@raphab3/hermes-client",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Standalone JavaScript client for Hermes notifications - works with any framework",
   "main": "hermes-client.js",
   "jsdelivr": "hermes-client.min.js",
