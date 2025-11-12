@@ -45,7 +45,7 @@
   "bugs": {
     "url": "https://github.com/raphab3/hermes-notifier-plugin-client/issues"
   },
-  "homepage": "https://github.com/raphab3/hermes-notifier-plugin-client/tree/main/plugins/js-standalone#readme",
+  "homepage": "https://github.com/raphab3/hermes-notifier-plugin-client#readme",
   "devDependencies": {
     "terser": "^5.44.1"
   }
