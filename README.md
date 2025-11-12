@@ -13,24 +13,24 @@
 
 ### Option 1: npm (Recommended)
 ```bash
-npm install @hermes-notifications/client
+npm install @raphab3/hermes-client
 ```
 
 Then use via CDN (automatically available):
 ```html
 <!-- Latest version -->
-<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client"></script>
+<script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client"></script>
 
 <!-- Specific version (recommended for production) -->
-<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client@1.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client@2.0.2"></script>
 
 <!-- Unminified for development -->
-<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client/hermes-client.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client/hermes-client.js"></script>
 ```
 
 ### Option 2: CDN only (no npm install)
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client"></script>
+<script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client"></script>
 ```
 
 ### Option 3: Copy the file
@@ -42,7 +42,7 @@ cp hermes-client.js /path/to/your/project/static/js/
 ### Option 4: Download
 ```bash
 # Download minified version
-curl -o hermes-client.min.js https://cdn.jsdelivr.net/npm/@hermes-notifications/client
+curl -o hermes-client.min.js https://cdn.jsdelivr.net/npm/@raphab3/hermes-client
 ```
 
 ---
@@ -57,7 +57,7 @@ curl -o hermes-client.min.js https://cdn.jsdelivr.net/npm/@hermes-notifications/
 <head>
     <title>Hermes Notifications</title>
     <!-- Load from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client"></script>
 </head>
 <body>
     <div id="notifications"></div>

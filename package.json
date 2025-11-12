@@ -15,7 +15,8 @@
   ],
   "scripts": {
     "build": "terser hermes-client.js -c -m -o hermes-client.min.js --comments false",
-    "prepublishOnly": "npm run build"
+    "update-readme": "node update-readme.js",
+    "prepublishOnly": "npm run update-readme && npm run build"
   },
   "keywords": [
     "notifications",
