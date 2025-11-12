@@ -22,7 +22,7 @@ Then use via CDN (automatically available):
 <script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client"></script>
 
 <!-- Specific version (recommended for production) -->
-<script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client@2.0.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client@2.0.3"></script>
 
 <!-- Unminified for development -->
 <script src="https://cdn.jsdelivr.net/npm/@raphab3/hermes-client/hermes-client.js"></script>
