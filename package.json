@@ -1,6 +1,6 @@
 {
-  "name": "@hermes-notifications/client",
-  "version": "1.0.0",
+  "name": "@raphab3/hermes-client",
+  "version": "2.0.1",
   "description": "Standalone JavaScript client for Hermes notifications - works with any framework",
   "main": "hermes-client.js",
   "jsdelivr": "hermes-client.min.js",
@@ -39,15 +39,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/raphab3/microceft-notifications.git",
-    "directory": "plugins/js-standalone"
+    "url": "https://github.com/raphab3/hermes-notifier-plugin-client.git",
+    "directory": ""
   },
   "bugs": {
-    "url": "https://github.com/raphab3/microceft-notifications/issues"
+    "url": "https://github.com/raphab3/hermes-notifier-plugin-client/issues"
   },
-  "homepage": "https://github.com/raphab3/microceft-notifications/tree/main/plugins/js-standalone#readme",
+  "homepage": "https://github.com/raphab3/hermes-notifier-plugin-client/tree/main/plugins/js-standalone#readme",
   "devDependencies": {
     "terser": "^5.44.1"
   }
 }
-
