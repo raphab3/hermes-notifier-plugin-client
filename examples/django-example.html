@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes Notifications - Django Example</title>
+    {% load static %}
+    
+    <!-- Load HermesClient standalone library -->
+    <script src="{% static 'js/hermes-client.js' %}"></script>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-8 max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold">
+                    🔔 Notifications
+                    <span id="unread-badge" class="ml-2 bg-red-500 text-white text-sm px-2 py-1 rounded-full hidden">
+                        0
+                    </span>
+                </h1>
+                
+                <div class="flex items-center gap-4">
+                    <!-- Connection Status -->
+                    <div class="flex items-center gap-2">
+                        <div id="status-indicator" class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span id="status-text" class="text-sm text-gray-600">Disconnected</span>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <button onclick="sendTestNotification()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Send Test
+                    </button>
+                    
+                    <button id="mark-all-btn" onclick="markAllAsRead()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 hidden">
+                        Mark All Read
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Notifications List -->
+            <div id="notifications-list" class="space-y-4">
+                <div class="text-center text-gray-500 py-8">
+                    Loading notifications...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration from Django context
+        const config = {
+            baseUrl: '{{ hermes_base_url|default:"http://localhost:8000" }}',
+            profileToken: '{{ profile_token }}',
+            userId: '{{ user_id }}',
+            debug: true
+        };
+        
+        // Initialize HermesClient
+        const hermesClient = new HermesClient(config);
+        let notifications = [];
+        let unreadCount = 0;
+        
+        // Update UI
+        function updateStatus(isConnected) {
+            const indicator = document.getElementById('status-indicator');
+            const text = document.getElementById('status-text');
+            
+            if (isConnected) {
+                indicator.className = 'w-3 h-3 rounded-full bg-green-500';
+                text.textContent = 'Connected';
+            } else {
+                indicator.className = 'w-3 h-3 rounded-full bg-red-500';
+                text.textContent = 'Disconnected';
+            }
+        }
+        
+        function updateUnreadBadge(count) {
+            unreadCount = count;
+            const badge = document.getElementById('unread-badge');
+            const markAllBtn = document.getElementById('mark-all-btn');
+            
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+                markAllBtn.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                markAllBtn.classList.add('hidden');
+            }
+        }
+        
+        function renderNotifications() {
+            const list = document.getElementById('notifications-list');
+            
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-500 py-8">No notifications yet</div>';
+                return;
+            }
+            
+            list.innerHTML = notifications.map(n => `
+                <div class="border rounded-lg p-4 ${n.is_read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-lg">${n.title}</h3>
+                            <p class="text-gray-700 mt-1">${n.body}</p>
+                            <div class="flex gap-4 mt-2 text-sm text-gray-500">
+                                <span>Priority: ${n.priority || 'normal'}</span>
+                                <span>${new Date(n.created_at).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        ${!n.is_read ? `
+                            <button 
+                                onclick="markAsRead('${n.id}')" 
+                                class="ml-4 bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                            >
+                                Mark Read
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Event Listeners
+        hermesClient.on('notification', (notification) => {
+            console.log('📨 New notification:', notification);
+            notifications.unshift(notification);
+            renderNotifications();
+            updateUnreadBadge(unreadCount + 1);
+            
+            // Show browser notification
+            if (Notification.permission === 'granted') {
+                new Notification(notification.title, {
+                    body: notification.body,
+                    icon: '/static/notification-icon.png'
+                });
+            }
+        });
+        
+        hermesClient.on('connected', () => {
+            console.log('✅ Connected to Hermes');
+            updateStatus(true);
+        });
+        
+        hermesClient.on('disconnected', () => {
+            console.log('❌ Disconnected from Hermes');
+            updateStatus(false);
+        });
+        
+        hermesClient.on('unreadCount', (count) => {
+            console.log('📊 Unread count:', count);
+            updateUnreadBadge(count);
+        });
+        
+        // Actions
+        async function sendTestNotification() {
+            try {
+                await hermesClient.sendNotification({
+                    userId: config.userId,
+                    title: 'Test Notification',
+                    body: 'This is a test notification from Django',
+                    priority: 'normal',
+                    channels: ['in_app']
+                });
+                alert('Notification sent!');
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function markAsRead(notificationId) {
+            try {
+                await hermesClient.markAsRead(notificationId);
+                notifications = notifications.map(n => 
+                    n.id === notificationId ? { ...n, is_read: true } : n
+                );
+                renderNotifications();
+                updateUnreadBadge(Math.max(0, unreadCount - 1));
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        }
+        
+        async function markAllAsRead() {
+            try {
+                await hermesClient.markAllAsRead();
+                notifications = notifications.map(n => ({ ...n, is_read: true }));
+                renderNotifications();
+                updateUnreadBadge(0);
+            } catch (error) {
+                console.error('Error marking all as read:', error);
+            }
+        }
+        
+        // Initialize
+        async function init() {
+            // Request notification permission
+            if (Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+            
+            // Connect to SSE
+            hermesClient.connectSSE();
+            
+            // Load existing notifications
+            try {
+                const result = await hermesClient.getNotifications({ limit: 50 });
+                notifications = result.results || [];
+                renderNotifications();
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+            
+            // Get unread count
+            try {
+                const count = await hermesClient.getUnreadCount();
+                updateUnreadBadge(count);
+            } catch (error) {
+                console.error('Error getting unread count:', error);
+            }
+        }
+        
+        // Start when page loads
+        init();
+    </script>
+</body>
+</html>
+

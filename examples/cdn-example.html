@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes Notifications - CDN Example</title>
+    
+    <!-- Load HermesClient from CDN -->
+    <script src="https://cdn.jsdelivr.net/gh/raphab3/microceft-notifications@main/plugins/js-standalone/hermes-client.min.js"></script>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .notification-toast {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto p-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">
+                🔔 Hermes Notifications
+            </h1>
+            <p class="text-gray-600">
+                Real-time notifications using CDN - No installation required!
+            </p>
+            <div class="mt-4 inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow">
+                <div id="status-indicator" class="w-3 h-3 rounded-full bg-red-500"></div>
+                <span id="status-text" class="text-sm font-medium">Disconnected</span>
+            </div>
+        </div>
+        
+        <!-- Configuration Panel -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">⚙️ Configuration</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Base URL
+                    </label>
+                    <input 
+                        type="text" 
+                        id="baseUrl" 
+                        value="http://localhost:8000"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        User ID
+                    </label>
+                    <input 
+                        type="text" 
+                        id="userId" 
+                        value="user-123"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Token
+                    </label>
+                    <input 
+                        type="text" 
+                        id="profileToken" 
+                        value="your-profile-token-here"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        App Token (for sending)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="appToken" 
+                        value="your-app-token-here"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+            </div>
+            <div class="mt-4 flex gap-4">
+                <button 
+                    onclick="connect()" 
+                    id="connectBtn"
+                    class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 font-medium"
+                >
+                    🔌 Connect
+                </button>
+                <button 
+                    onclick="disconnect()" 
+                    id="disconnectBtn"
+                    class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 font-medium"
+                    disabled
+                >
+                    🔌 Disconnect
+                </button>
+            </div>
+        </div>
+        
+        <!-- Actions Panel -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">🚀 Actions</h2>
+            <div class="flex flex-wrap gap-4">
+                <button 
+                    onclick="sendTestNotification()" 
+                    class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 font-medium"
+                >
+                    📨 Send Test Notification
+                </button>
+                <button 
+                    onclick="loadNotifications()" 
+                    class="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 font-medium"
+                >
+                    📥 Load Notifications
+                </button>
+                <button 
+                    onclick="getUnreadCount()" 
+                    class="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 font-medium"
+                >
+                    📊 Get Unread Count
+                </button>
+                <button 
+                    onclick="markAllAsRead()" 
+                    class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 font-medium"
+                >
+                    ✅ Mark All Read
+                </button>
+            </div>
+        </div>
+        
+        <!-- Notifications Panel -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">
+                    📬 Notifications
+                    <span id="unread-badge" class="ml-2 bg-red-500 text-white text-sm px-3 py-1 rounded-full hidden">
+                        0
+                    </span>
+                </h2>
+                <span id="total-count" class="text-gray-600">0 total</span>
+            </div>
+            <div id="notifications-list" class="space-y-4 max-h-96 overflow-y-auto">
+                <div class="text-center text-gray-500 py-8">
+                    No notifications yet. Connect and send a test notification!
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+    
+    <script>
+        let hermesClient = null;
+        let notifications = [];
+        
+        // Update UI
+        function updateStatus(isConnected) {
+            const indicator = document.getElementById('status-indicator');
+            const text = document.getElementById('status-text');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            
+            if (isConnected) {
+                indicator.className = 'w-3 h-3 rounded-full bg-green-500 animate-pulse';
+                text.textContent = 'Connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else {
+                indicator.className = 'w-3 h-3 rounded-full bg-red-500';
+                text.textContent = 'Disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+        
+        function updateUnreadBadge(count) {
+            const badge = document.getElementById('unread-badge');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const colors = {
+                info: 'bg-blue-500',
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg max-w-sm`;
+            toast.innerHTML = `
+                <div class="font-bold">${title}</div>
+                <div class="text-sm">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+        
+        function renderNotifications() {
+            const list = document.getElementById('notifications-list');
+            const totalCount = document.getElementById('total-count');
+            
+            totalCount.textContent = `${notifications.length} total`;
+            
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-500 py-8">No notifications yet</div>';
+                return;
+            }
+            
+            list.innerHTML = notifications.map(n => `
+                <div class="border rounded-lg p-4 ${n.is_read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-lg">${n.title}</h3>
+                            <p class="text-gray-700 mt-1">${n.body}</p>
+                            <div class="flex gap-4 mt-2 text-sm text-gray-500">
+                                <span>Priority: ${n.priority || 'normal'}</span>
+                                <span>${new Date(n.created_at).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        ${!n.is_read ? `
+                            <button 
+                                onclick="markAsRead('${n.id}')" 
+                                class="ml-4 bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                            >
+                                Mark Read
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Actions
+        function connect() {
+            const config = {
+                baseUrl: document.getElementById('baseUrl').value,
+                profileToken: document.getElementById('profileToken').value,
+                appToken: document.getElementById('appToken').value,
+                userId: document.getElementById('userId').value,
+                debug: true
+            };
+            
+            hermesClient = new HermesClient(config);
+            
+            hermesClient.on('notification', (notification) => {
+                console.log('📨 New notification:', notification);
+                notifications.unshift(notification);
+                renderNotifications();
+                showToast(notification.title, notification.body, 'info');
+            });
+            
+            hermesClient.on('connected', () => {
+                console.log('✅ Connected');
+                updateStatus(true);
+                showToast('Connected', 'Successfully connected to Hermes', 'success');
+            });
+            
+            hermesClient.on('disconnected', () => {
+                console.log('❌ Disconnected');
+                updateStatus(false);
+                showToast('Disconnected', 'Connection closed', 'warning');
+            });
+            
+            hermesClient.on('unreadCount', (count) => {
+                console.log('📊 Unread count:', count);
+                updateUnreadBadge(count);
+            });
+            
+            hermesClient.connectSSE();
+        }
+        
+        function disconnect() {
+            if (hermesClient) {
+                hermesClient.disconnectSSE();
+                hermesClient = null;
+            }
+        }
+        
+        async function sendTestNotification() {
+            if (!hermesClient) {
+                showToast('Error', 'Please connect first', 'error');
+                return;
+            }
+            
+            try {
+                await hermesClient.sendNotification({
+                    userId: document.getElementById('userId').value,
+                    title: 'Test Notification',
+                    body: 'This is a test notification from CDN example',
+                    priority: 'normal',
+                    channels: ['in_app']
+                });
+                showToast('Success', 'Notification sent!', 'success');
+            } catch (error) {
+                showToast('Error', error.message, 'error');
+            }
+        }
+        
+        async function loadNotifications() {
+            if (!hermesClient) {
+                showToast('Error', 'Please connect first', 'error');
+                return;
+            }
+            
+            try {
+                const result = await hermesClient.getNotifications({ limit: 50 });
+                notifications = result.results || [];
+                renderNotifications();
+                showToast('Success', `Loaded ${notifications.length} notifications`, 'success');
+            } catch (error) {
+                showToast('Error', error.message, 'error');
+            }
+        }
+        
+        async function getUnreadCount() {
+            if (!hermesClient) {
+                showToast('Error', 'Please connect first', 'error');
+                return;
+            }
+            
+            try {
+                const count = await hermesClient.getUnreadCount();
+                updateUnreadBadge(count);
+                showToast('Unread Count', `You have ${count} unread notifications`, 'info');
+            } catch (error) {
+                showToast('Error', error.message, 'error');
+            }
+        }
+        
+        async function markAsRead(notificationId) {
+            if (!hermesClient) return;
+            
+            try {
+                await hermesClient.markAsRead(notificationId);
+                notifications = notifications.map(n => 
+                    n.id === notificationId ? { ...n, is_read: true } : n
+                );
+                renderNotifications();
+                showToast('Success', 'Marked as read', 'success');
+            } catch (error) {
+                showToast('Error', error.message, 'error');
+            }
+        }
+        
+        async function markAllAsRead() {
+            if (!hermesClient) {
+                showToast('Error', 'Please connect first', 'error');
+                return;
+            }
+            
+            try {
+                await hermesClient.markAllAsRead();
+                notifications = notifications.map(n => ({ ...n, is_read: true }));
+                renderNotifications();
+                updateUnreadBadge(0);
+                showToast('Success', 'All notifications marked as read', 'success');
+            } catch (error) {
+                showToast('Error', error.message, 'error');
+            }
+        }
+        
+        // Request notification permission
+        if (Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>
+

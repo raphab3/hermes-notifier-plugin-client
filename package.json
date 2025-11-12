@@ -1,0 +1,53 @@
+{
+  "name": "@hermes-notifications/client",
+  "version": "1.0.0",
+  "description": "Standalone JavaScript client for Hermes notifications - works with any framework",
+  "main": "hermes-client.js",
+  "jsdelivr": "hermes-client.min.js",
+  "unpkg": "hermes-client.min.js",
+  "browser": "hermes-client.min.js",
+  "types": "hermes-client.d.ts",
+  "files": [
+    "hermes-client.js",
+    "hermes-client.min.js",
+    "hermes-client.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "terser hermes-client.js -c -m -o hermes-client.min.js --comments false",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "notifications",
+    "hermes",
+    "sse",
+    "server-sent-events",
+    "real-time",
+    "push-notifications",
+    "standalone",
+    "framework-agnostic",
+    "react",
+    "vue",
+    "angular",
+    "django",
+    "cdn",
+    "browser",
+    "websocket",
+    "event-stream"
+  ],
+  "author": "Hermes Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raphab3/microceft-notifications.git",
+    "directory": "plugins/js-standalone"
+  },
+  "bugs": {
+    "url": "https://github.com/raphab3/microceft-notifications/issues"
+  },
+  "homepage": "https://github.com/raphab3/microceft-notifications/tree/main/plugins/js-standalone#readme",
+  "devDependencies": {
+    "terser": "^5.44.1"
+  }
+}
+
