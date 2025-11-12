@@ -11,25 +11,38 @@
 
 ## 📦 Installation
 
-### Option 1: CDN (Recommended)
-```html
-<!-- Latest version -->
-<script src="https://cdn.jsdelivr.net/gh/raphab3/microceft-notifications@main/plugins/js-standalone/hermes-client.min.js"></script>
-
-<!-- Specific version (recommended for production) -->
-<script src="https://cdn.jsdelivr.net/gh/raphab3/microceft-notifications@v1.0.0/plugins/js-standalone/hermes-client.min.js"></script>
+### Option 1: npm (Recommended)
+```bash
+npm install @hermes-notifications/client
 ```
 
-### Option 2: Copy the file
+Then use via CDN (automatically available):
+```html
+<!-- Latest version -->
+<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client"></script>
+
+<!-- Specific version (recommended for production) -->
+<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client@1.0.0"></script>
+
+<!-- Unminified for development -->
+<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client/hermes-client.js"></script>
+```
+
+### Option 2: CDN only (no npm install)
+```html
+<script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client"></script>
+```
+
+### Option 3: Copy the file
 ```bash
 # Copy to your project
 cp hermes-client.js /path/to/your/project/static/js/
 ```
 
-### Option 3: Download
+### Option 4: Download
 ```bash
 # Download minified version
-curl -o hermes-client.min.js https://cdn.jsdelivr.net/gh/raphab3/microceft-notifications@main/plugins/js-standalone/hermes-client.min.js
+curl -o hermes-client.min.js https://cdn.jsdelivr.net/npm/@hermes-notifications/client
 ```
 
 ---
@@ -44,7 +57,7 @@ curl -o hermes-client.min.js https://cdn.jsdelivr.net/gh/raphab3/microceft-notif
 <head>
     <title>Hermes Notifications</title>
     <!-- Load from CDN -->
-    <script src="https://cdn.jsdelivr.net/gh/raphab3/microceft-notifications@main/plugins/js-standalone/hermes-client.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@hermes-notifications/client"></script>
 </head>
 <body>
     <div id="notifications"></div>
